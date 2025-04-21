@@ -6,7 +6,8 @@ Rather than using the commonly used MNIST or CIFAR-10 datasets, a "voter ballot"
 # Running Attacks
 1. Download relevant software packages as detailed below.
 2. Install all the files in the repository.
-3. In an IDE of your choosing, go into the CleanTraining.py file and edit directories to match those on your personal device.
+    - The data used in these attacks is too large to upload and was distrubuted via private means; it is currently not obtainable by non-URI students.
+4. In an IDE of your choosing, go into the CleanTraining.py file and edit directories to match those on your personal device.
     - In the args segment of the run_attack_pt.py file, change any hyperparameters before running the attack.
 5. In a terminal, type the following command: ```python run_attack_pt.py```.
     - There are flags that can be used to control other various hyperparameters found in the same file
