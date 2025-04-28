@@ -7,6 +7,8 @@ import numpy as np
 import torch
 from utils_pt import get_logits, get_predictions
 
+import matplotlib.pyplot as plt
+
 def onepixel_perturbation(attack, orig_x, pos, sigma):
   ''' returns a batch with the possible perturbations of the pixel in position pos '''
     
@@ -165,6 +167,8 @@ class CSattack():
   
   def perturb(self, x_nat, y_nat):
     adv = np.copy(x_nat)
+    # Copy of the original images
+    xCopy = np.copy(x_nat)
     fl_success = np.ones([x_nat.shape[0]])
     self.shape_img = x_nat.shape[1:]
     self.sigma = sigma_map(x_nat)
@@ -182,7 +186,7 @@ class CSattack():
         batch_y = np.squeeze(y_nat[c])
         logit_2 = np.zeros([batch_x.shape[0], self.n_classes])
         found = False
-        
+
         # checks one-pixels modifications
         for counter in range(self.n_corners):
           #logit_2[counter*bs:(counter+1)*bs], pred = sess.run([self.model.y, self.model.correct_prediction], feed_dict={self.model.x_input: batch_x[counter*bs:(counter+1)*bs], self.model.y_input: np.tile(batch_y,(bs))})
@@ -193,6 +197,19 @@ class CSattack():
             adv[c] = batch_x[counter*bs + ind_adv[0][0]]
             found = True
             print('Point {} - adversarial example found changing 1 pixel'.format(c))
+
+            # Show the original and adversarial images to highlight the pixel change
+            fig, axes = plt.subplots(1, 2)
+            # Display the original image in the first subplot
+            axes[0].imshow(xCopy[c], cmap='gray')
+            axes[0].axis('off')
+            axes[0].set_title('Original')
+            # Display adversarial example in the second subplot
+            axes[1].imshow(adv[c], cmap='gray')
+            axes[1].axis('off')
+            axes[1].set_title('Adversarial')
+            plt.tight_layout()
+            plt.show()
         
         # creates the orderings
         t1 = np.copy(logit_2[:, batch_y])
@@ -213,12 +230,24 @@ class CSattack():
                  batch_x = npixels_perturbation(self, x_nat[c], ind_cl, n3, sigma)
                  #pred = sess.run(self.model.correct_prediction, feed_dict={self.model.x_input: batch_x, self.model.y_input: np.tile(batch_y,(batch_x.shape[0]))})
                  pred = get_predictions(self.model, batch_x, np.tile(batch_y,(batch_x.shape[0])))
-                 
                  if np.sum(pred.astype(np.int32)) < self.n_iter and not found:
                    found = True
                    ind_adv = np.where(pred.astype(int)==0)
                    adv[c] = batch_x[ind_adv[0][0]]
                    print('Point {} - adversarial example found changing {} pixels'.format(c, np.sum(np.amax(np.abs(adv[c] - x_nat[c]) > 1e-10, axis=-1), axis=(0,1))))
+                   
+                   # Show the original and adversarial images
+                   fig, axes = plt.subplots(1, 2)
+                   axes[0].imshow(xCopy[c], cmap='gray')
+                   axes[0].axis('off')
+                   axes[0].set_title('Original')
+
+                   axes[1].imshow(adv[c], cmap='gray')
+                   axes[1].axis('off')
+                   axes[1].set_title('Adversarial')
+
+                   plt.tight_layout()
+                   plt.show()
         
         if not found:
           fl_success[c] = 0

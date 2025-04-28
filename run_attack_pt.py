@@ -17,7 +17,7 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Define hyperparameters.')
   parser.add_argument('--model', type=str, default='resnet', help='resnet, cnn')
   parser.add_argument('--dataset', type=str, default='C:/Users/Ryan Tsang/Projects/CSC492/Final_Project/data/val_dataset.npz')
-  parser.add_argument('--attack', type=str, default='PGD', help='PGD, CS')
+  parser.add_argument('--attack', type=str, default='CS', help='PGD, CS')
   parser.add_argument('--path_results', type=str, default='none')
   parser.add_argument('--n_examples', type=int, default=50)
   
@@ -61,12 +61,12 @@ if __name__ == '__main__':
   elif hps.attack == 'CS':
     import cornersearch_attacks_pt
     
-    args = {'type_attack': 'L0+sigma',  # 'L0', 'L0+Linf', 'L0+sigma'
+    args = {'type_attack': 'L0+Linf',  # 'L0', 'L0+Linf', 'L0+sigma'
             'n_iter': 1000,
             'n_max': 100,
             'kappa': 0.9,
             'epsilon': 0.4,
-            'sparsity': 50,
+            'sparsity': 15,
             'size_incr': 1}
     
     attack = cornersearch_attacks_pt.CSattack(model, args)
